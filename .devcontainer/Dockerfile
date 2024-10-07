@@ -7,7 +7,8 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
         vim \
         gnupg \
         openssh-client \
-        bash-completion && \
+        bash-completion \
+        libssl-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
