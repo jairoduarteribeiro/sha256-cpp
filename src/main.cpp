@@ -3,8 +3,10 @@
 #include <array>
 #include <chrono>
 #include <fstream>
+#include <future>
 #include <iomanip>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <span>
 #include <sstream>
@@ -56,11 +58,16 @@ int main(int argc, char* argv[]) {
   }
 
   auto start = std::chrono::high_resolution_clock::now();
+  std::map<std::string, std::future<std::string>> futures;
   for (int i{1}; i < argc; ++i) {
+    futures.emplace(argv[i], std::async(std::launch::async, sha256_of_file, argv[i]));
+  }
+
+  for (auto& [file, future] : futures) {
     try {
-      std::cout << sha256_of_file(argv[i]) << "  " << argv[i] << std::endl;
+      std::cout << future.get() << "  " << file << std::endl;
     } catch (const std::exception& e) {
-      std::cerr << "Error: " << e.what() << std::endl;
+      std::cerr << "Error processing file " << file << ": " << e.what() << std::endl;
     }
   }
 
